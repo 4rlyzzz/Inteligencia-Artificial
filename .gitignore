@@ -1,0 +1,45 @@
+# Executables
+*.exe
+*.out
+*.app
+*.bin
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+*.la
+*.lai
+
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Linker and Debugger files
+*.ilk
+*.pdb
+*.exp
+*.dwo
+
+# Prerequisites
+*.d
+*.dep
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Fortran module files
+*.mod
+*.smod
+
+# System files and Logs
+.DS_Store
+Thumbs.db
+*.log
