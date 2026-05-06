@@ -7,8 +7,7 @@ const char iconYO = 'X';
 const char iconIA = 'O';
 const char empty = ' ';
 
-void printTablero(const std::vector<char>& tab) 
-{
+void printTablero(const std::vector<char>& tab) {
     // print index
     std::cout << "\n\t";
     for (int i = 0; i < sizeTab; i++)
@@ -20,10 +19,8 @@ void printTablero(const std::vector<char>& tab)
         std::cout << "-------";
     std::cout << std::endl;
 
-
     // print tab
-    for (int row = 0; row < sizeTab; row++) 
-    {
+    for (int row = 0; row < sizeTab; row++) {
         std::cout << "    " << row << " | ";
         for (int column = 0; column < sizeTab; column++)
             std::cout << tab[row * sizeTab + column] << "\t";
@@ -33,21 +30,17 @@ void printTablero(const std::vector<char>& tab)
 }
 
 /*
-bool checkWin(const std::vector<char>& tab, char player, int r, int c) // - | \ / 
-{ 
-
+bool checkWin(const std::vector<char>& tab, char player, int r, int c) { // - | \ / 
     int dr[] = { 0, 1, 1, 1 };
     int dc[] = { 1, 0, 1, -1 };
 
-    for (int i = 0; i < 4; i++) 
-    {
+    for (int i = 0; i < 4; i++) {
         int cont = 1;
 
         // direccion -> abajo, derecha, diagonal(\)
         int cooR = r + dr[i];
         int cooC = c + dc[i];
-        while (cooR >= 0 && cooR < sizeTab && cooC >= 0 && cooC < sizeTab && tab[cooR * sizeTab + cooC] == player) // posiciones R  |  posiciones C  |  jugador
-        { 
+        while (cooR >= 0 && cooR < sizeTab && cooC >= 0 && cooC < sizeTab && tab[cooR * sizeTab + cooC] == player) { // posiciones R  |  posiciones C  |  jugador
             cont++;
             cooR += dr[i];
             cooC += dc[i];
@@ -56,8 +49,7 @@ bool checkWin(const std::vector<char>& tab, char player, int r, int c) // - | \ 
         // direccion -> arriba, izquierda, diagonal(/)
         cooR = r - dr[i];
         cooC = c - dc[i];
-        while (cooR >= 0 && cooR < sizeTab && cooC >= 0 && cooC < sizeTab && tab[cooR * sizeTab + cooC] == player) // posiciones R  |  posiciones C  |  jugador
-        { 
+        while (cooR >= 0 && cooR < sizeTab && cooC >= 0 && cooC < sizeTab && tab[cooR * sizeTab + cooC] == player) { // posiciones R  |  posiciones C  |  jugador
             cont++;
             cooR -= dr[i];
             cooC -= dc[i];
@@ -70,16 +62,13 @@ bool checkWin(const std::vector<char>& tab, char player, int r, int c) // - | \ 
 }
 */
 
-bool checkWin_N(const std::vector<char>& tab, char player) 
-{
+bool checkWin_N(const std::vector<char>& tab, char player) {
+
     // rows
-    for (int r = 0; r < sizeTab; r++) 
-    {
+    for (int r = 0; r < sizeTab; r++) {
         bool win = true;
-        for (int c = 0; c < sizeTab; c++) 
-        {
-            if (tab[r * sizeTab + c] != player) 
-            { 
+        for (int c = 0; c < sizeTab; c++) {
+            if (tab[r * sizeTab + c] != player) { 
                 win = false; 
                 break; 
             }
@@ -88,13 +77,10 @@ bool checkWin_N(const std::vector<char>& tab, char player)
     }
 
     // cols
-    for (int c = 0; c < sizeTab; c++) 
-    {
+    for (int c = 0; c < sizeTab; c++) {
         bool win = true;
-        for (int r = 0; r < sizeTab; r++)
-        {
-            if (tab[r * sizeTab + c] != player)
-            { 
+        for (int r = 0; r < sizeTab; r++) {
+            if (tab[r * sizeTab + c] != player) { 
                 win = false; 
                 break; 
             }
@@ -105,8 +91,7 @@ bool checkWin_N(const std::vector<char>& tab, char player)
     // diagonal (\)
     bool win = true;
     for (int i = 0; i < sizeTab; i++) {
-        if (tab[i * sizeTab + i] != player) 
-        { 
+        if (tab[i * sizeTab + i] != player) { 
             win = false; 
             break; 
         }
@@ -116,8 +101,7 @@ bool checkWin_N(const std::vector<char>& tab, char player)
     // diagonal (/)
     win = true;
     for (int i = 0; i < sizeTab; i++) {
-        if (tab[i * sizeTab + (sizeTab - i - 1)] != player) 
-        { 
+        if (tab[i * sizeTab + (sizeTab - i - 1)] != player) { 
             win = false; 
             break; 
         }
@@ -127,22 +111,19 @@ bool checkWin_N(const std::vector<char>& tab, char player)
     return false;
 }
 
-bool tie(std::vector<char> tab) 
-{
-    for (int i = 0; i < sizeTab * sizeTab; i++) 
-    {
+bool tie(std::vector<char> tab) {
+    for (int i = 0; i < sizeTab * sizeTab; i++) {
         if (tab[i] == empty)
             return false;
     }
     return true;
 }
 
+struct node {
 
-struct node 
-{
     std::vector<node*> child;
     int value;
-    std::pair<int, int> coord;
+    std::pair<int, int> coord; // position
 
     node(int v, std::pair<int, int> c = { -1,-1 }) : value(v), coord(c) {}
 };
@@ -150,24 +131,20 @@ struct node
 struct tree {
     node* root = nullptr;
 
-    int optionWin(const std::vector<char>& tab, char icon) 
-    {
+    // counts lines (rows, cols, diagonals) that still available for icon
+    int optionWin(const std::vector<char>& tab, char icon) {
         char opponent;
 
         if (icon == iconIA) opponent = iconYO;
         else  opponent = iconIA;
 
-
         int options = 0;
 
         // row
-        for (int r = 0; r < sizeTab; r++) 
-        {
+        for (int r = 0; r < sizeTab; r++) {
             bool blocked = false;
-            for (int c = 0; c < sizeTab; c++) 
-            {
-                if (tab[r * sizeTab + c] == opponent) 
-                {
+            for (int c = 0; c < sizeTab; c++) {
+                if (tab[r * sizeTab + c] == opponent) {
                     blocked = true;
                     break;
                 }
@@ -176,13 +153,10 @@ struct tree {
         }
 
         // col
-        for (int c = 0; c < sizeTab; c++) 
-        {
+        for (int c = 0; c < sizeTab; c++) {
             bool blocked = false;
-            for (int r = 0; r < sizeTab; r++) 
-            {
-                if (tab[r * sizeTab + c] == opponent) 
-                {
+            for (int r = 0; r < sizeTab; r++) {
+                if (tab[r * sizeTab + c] == opponent) {
                     blocked = true;
                     break;
                 }
@@ -192,10 +166,8 @@ struct tree {
 
         // diagonal (\)
         bool blocked = false;
-        for (int i = 0; i < sizeTab; i++) 
-        {
-            if (tab[i * sizeTab + i] == opponent) 
-            {
+        for (int i = 0; i < sizeTab; i++) {
+            if (tab[i * sizeTab + i] == opponent) {
                 blocked = true;
                 break;
             }
@@ -204,10 +176,8 @@ struct tree {
 
         // diagonal (/)
         blocked = false;
-        for (int i = 0; i < sizeTab; i++) 
-        {
-            if (tab[i * sizeTab + (sizeTab - i - 1)] == opponent) 
-            {
+        for (int i = 0; i < sizeTab; i++) {
+            if (tab[i * sizeTab + (sizeTab - i - 1)] == opponent) {
                 blocked = true;
                 break;
             }
@@ -217,33 +187,27 @@ struct tree {
         return options;
     }
 
-    node* buildTree(const std::vector<char>& tab, int r, int c, int level, int currentLevel) 
-    {
-
-        //if (checkWin(tab, iconIA, r, c) || checkWin(tab, iconYO, r, c) || tie(tab) || currentLevel >= level)
-        if (checkWin_N(tab, iconIA) || checkWin_N(tab, iconYO) || tie(tab) || currentLevel >= level) 
-        {
+    // builds the full tree up to level 
+    node* buildTree(const std::vector<char>& tab, int r, int c, int level, int currentLevel) {
+        
+        //if (checkWin(tab, iconIA, r, c) || checkWin(tab, iconYO, r, c) || tie(tab) || currentLevel >= level) {
+        if (checkWin_N(tab, iconIA) || checkWin_N(tab, iconYO) || tie(tab) || currentLevel >= level) {
             int scoreIA = optionWin(tab, iconIA);
             int scoreYO = optionWin(tab, iconYO);
 
             return new node(scoreIA - scoreYO);
         }
 
-        // 
+        // even level → AI moves, odd level → human moves
         char currentIcon;
         if (currentLevel % 2 == 0) currentIcon = iconIA;
         else currentIcon = iconYO;
 
-
-        //
         node* current = new node(0);
 
-        for (int r_t = 0; r_t < sizeTab; r_t++) 
-        {
-            for (int c_t = 0; c_t < sizeTab; c_t++) 
-            {
-                if (tab[r_t * sizeTab + c_t] == empty)
-                {
+        for (int r_t = 0; r_t < sizeTab; r_t++) {
+            for (int c_t = 0; c_t < sizeTab; c_t++) {
+                if (tab[r_t * sizeTab + c_t] == empty){
                     std::vector<char> tabCopy = tab;
 
                     tabCopy[r_t * sizeTab + c_t] = currentIcon;
@@ -259,21 +223,19 @@ struct tree {
         return current;
     }
 
-    int alphaBeta(node* node, int alpha, int beta, int level) 
-    {
+    // alpha-beta pruning
+    int alphaBeta(node* node, int alpha, int beta, int level) {
 
         if (node->child.empty()) return node->value;
 
         bool isMax;
-        if (level % 2 == 0) isMax = true; // max
-        else isMax = false; // min
+        if (level % 2 == 0) isMax = true; // even = max
+        else isMax = false; // odd = min
 
-        if (isMax) // max
-        { 
+        if (isMax) { // max
             int best = std::numeric_limits<int>::min();
 
-            for (auto i : node->child) 
-            {
+            for (auto i : node->child) {
                 int newValue = alphaBeta(i, alpha, beta, level + 1);
 
                 best = std::max(best, newValue);
@@ -284,12 +246,10 @@ struct tree {
             node->value = best;
             return best;
         }
-        else // min
-        { 
+        else { // min
             int best = std::numeric_limits<int>::max();
 
-            for (auto i : node->child) 
-            {
+            for (auto i : node->child) {
                 int newValue = alphaBeta(i, alpha, beta, level + 1);
 
                 best = std::min(best, newValue);
@@ -302,20 +262,17 @@ struct tree {
         }
     }
 
-    std::pair<int, int> bestMove(node* root)
-    {
-        for (auto children : root->child)
-        {
+    // return coord of the child that matches the value of the root
+    std::pair<int, int> bestMove(node* root) {
+        for (auto children : root->child) {
             if (children->value == root->value)
                 return children->coord;
         }
-
         return { -1,-1 };
     }
 };
 
-int main()
-{
+int main() {
     std::cout << "Size Tab: ";
     std::cin >> sizeTab;
 
@@ -337,22 +294,19 @@ int main()
 
     int rowIA = 0, colIA = 0;
 
-    while (true) 
-    {
+    while (true) {
 
-        if (turn == 1) // human
-        { 
+        // choose turn -> build tree -> alpha-beta -> pick best move
+        if (turn == 1) { // human
             int row, col;
             std::cout << "ROW COL: ";
             std::cin >> row >> col;
 
-            if (row >= sizeTab || row < 0 || col >= sizeTab || col < 0) 
-            {
+            if (row >= sizeTab || row < 0 || col >= sizeTab || col < 0) {
                 std::cout << "Invalid range. ";
                 continue;
             }
-            if (tablero[row * sizeTab + col] != empty) 
-            {
+            if (tablero[row * sizeTab + col] != empty) {
                 std::cout << "Cell occupied. ";
                 continue;
             }
@@ -362,21 +316,17 @@ int main()
             printTablero(tablero);
 
             //if (checkWin(tablero, 'X', row, col)) {
-            if (checkWin_N(tablero, 'X')) 
-            {
+            if (checkWin_N(tablero, 'X')) {
                 std::cout << "You win\n";
                 break;
             }
-            if (tie(tablero)) 
-            {
+            if (tie(tablero)) {
                 std::cout << "Tie\n";
                 break;
             }
-
             turn = 2;
         }
-        else // IA
-        { 
+        else { // IA
             tree t;
             node* root = t.buildTree(tablero, rowIA, colIA, level, 0);
             t.alphaBeta(root, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0);
@@ -387,17 +337,14 @@ int main()
             printTablero(tablero);
 
             //if (checkWin(tablero, 'O', iaRow, iaCol))
-            if (checkWin_N(tablero, 'O')) 
-            {
+            if (checkWin_N(tablero, 'O')) {
                 std::cout << "IA wins\n";
                 break;
             }
-            if (tie(tablero)) 
-            {
+            if (tie(tablero)) {
                 std::cout << "Tie\n";
                 break;
             }
-
             turn = 1;
         }
     }
